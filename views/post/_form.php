@@ -27,7 +27,6 @@ use app\models\Author;
     <?= $form->field($model, 'date')->widget(DatePicker::class, [
         'language' => 'ru',
         'dateFormat' => 'php:Y-m-d',
-//        'options' => ['value' => date('Y-m-d')]
     ]) ?>
 
     <div class="form-group">

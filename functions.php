@@ -6,8 +6,7 @@
 
 /**
  * Позволяет преобразовать первую букву строки в строчный вид в кодировке UTF-8
- *
- * @param $str string
+ * @param string $str
  * @return string
  */
 function ucfirst_utf8($str)
@@ -17,7 +16,6 @@ function ucfirst_utf8($str)
 
 /**
  * Выводит содержание объекта в удобном виде
- *
  * @param $arr
  */
 function debug($arr)

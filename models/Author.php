@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use Yii;
 
 /**
  * This is the model class for table "author".
@@ -49,6 +48,6 @@ class Author extends \yii\db\ActiveRecord
      */
     public function getPosts()
     {
-        return $this->hasMany(Post::className(), ['author_id' => 'id']);
+        return $this->hasMany(Post::class, ['author_id' => 'id']);
     }
 }

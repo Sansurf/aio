@@ -32,15 +32,20 @@ class GeneratorController extends Controller
      */
     public function actionIndex()
     {
+        // получение массивов из БД
+        $languages = Language::find()->all();
+        $authorNames = Author::find()->indexBy('name')->all();
+
         $arrInsert = [];
         $i = 0;
 
         for (; $i < $this->count; $i++) {
 
-            $language = $this->getLanguage();
-            $author = $this->getAuthor($language);
-            $title = $this->getTitle($language);
-            $text = $this->getText($language);
+            $lang = $this->lang($languages)->title;
+            $language = $this->lang($languages)->id;
+            $author = $this->getAuthor($authorNames, $lang);
+            $title = $this->getTitle($lang);
+            $text = $this->getText($lang);
             $date = $this->getDate();
             $likes = $this->getCountLikes();
 
@@ -49,47 +54,43 @@ class GeneratorController extends Controller
 
         Yii::$app->db->createCommand()->batchInsert('post', [
             'language_id', 'author_id', 'title', 'text', 'date', 'like'
-        ], $arrInsert);
+        ], $arrInsert)->execute();
 
         return $this->redirect(['/post']);
     }
 
     /**
-     * Получает наименование языка из случайного значения массива
+     * Выбор языка
      * @var object $languages
-     * @return string
+     * @return array
      */
-    private function getLanguage()
+    private function lang($arr)
     {
-        $languages = Language::find()->all();
-        $arr = $languages[array_rand($languages)];
-        $language = $arr->title;
+        $arrRand = $arr[array_rand($arr)];
+        $language = $arrRand;
 
         return $language;
     }
 
     /**
-     * Возвращает массив Авторов на английском или русском языках
-     * @param string $language
-     * @var object authors
-     * @return string
+     * Получает ID автора в зависимости от языка
+     * @param string $lang
+     * @param array $arr
+     * @return int
      */
-    private function getAuthor($language)
+    private function getAuthor($arr, $lang)
     {
-        $authors = Author::find()->indexBy('name')->asArray()->all();
+        $author = ($lang == 'English') ?
+            $this->selLanguage($arr) :
+            $this->selLanguage($arr, false);
+        $author = array_rand($author);
 
-        $author = ($language == 'English') ?
-            $this->selLanguage($authors) :
-            $this->selLanguage($authors, false);
-
-        return array_rand($author);
+        return $arr[$author]['id'];
     }
 
     /**
      * Собирает из массива слов предложение
      * @param string $language
-     * @function ucfirst_utf8 Позволяет сделать
-     *      первую букву заглавной в строке с кириллицей
      * @return string
      */
     private function getTitle($language)
@@ -104,6 +105,7 @@ class GeneratorController extends Controller
     }
 
     /**
+     * Получает текст поста
      * @param string $language
      * @return string
      */
@@ -132,8 +134,9 @@ class GeneratorController extends Controller
      */
     private function getDate()
     {
-        $dateRand = rand(1, 8);
-        $date = strtotime('2017-' . $dateRand . '-' . $dateRand);
+        $mRand = rand(1, 8);
+        $dRand = rand(1, 8);
+        $date = date('2017-' . $mRand . '-' . $dRand);
 
         return $date;
     }
@@ -149,9 +152,8 @@ class GeneratorController extends Controller
 
     /**
      * Выбор из массива английских/русских слов
-     * - метод предназначен для выбора заголовка по выбранному языку
      * @param array $fullArray
-     * @param boolean $eng
+     * @param bool $eng
      * @return array $sliceArray
      */
     private function selLanguage($fullArray, $eng = true)

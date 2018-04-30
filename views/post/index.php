@@ -36,10 +36,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'author.name'
             ],
             [
-                'attribute' => 'language_id',
-                'value' => 'language.title'
-            ],
-            [
                 'attribute' => 'date',
                 'format' => ['date', 'php:d-m-Y']
             ],
