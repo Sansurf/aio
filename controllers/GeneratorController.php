@@ -15,7 +15,7 @@ use app\models\Author;
  */
 class GeneratorController extends Controller
 {
-    public $count = 10; //TODO: Добавить поле для ввода
+    public $count = 100; //TODO: Добавить поле для ввода
     private $titles = [
         'rus' => ["жесть", "удивительно", "снова", "совсем", "шок", "случай", "сразу", "событие", "начало", "вирус"],
         'eng' => ["currency", "amazing", "again", "absolutely", "shocking", "case", "immediately", "event", "beginning", "virus"]
@@ -29,6 +29,7 @@ class GeneratorController extends Controller
     /**
      * Формирует запрос в БД
      * @return \yii\web\Response
+     * @throws \yii\db\Exception
      */
     public function actionIndex()
     {
@@ -142,12 +143,31 @@ class GeneratorController extends Controller
     }
 
     /**
-     * Случайное число лайков
+     * Случайное число лайков со смещением
      * @return int
      */
     private function getCountLikes()
     {
-        return rand(0, 100);
+        // Получает массив элементов со своими весами по квадратичной формуле
+        $arr = [];
+        for ($i = 0; $i < 100; $i++) {
+            $weight = pow($i, 2);
+            $arr[$i] = $weight;
+        }
+
+        // Сортирует массив в обратном порядке
+        rsort($arr);
+        // Сортирует массив с сохранением ключей
+        asort($arr);
+
+        $rand = rand(0, $arr[0]);
+
+        foreach ($arr as $index => $item) {
+
+            if ($rand < $item+1) {
+                return $index+1;
+            }
+        }
     }
 
     /**
